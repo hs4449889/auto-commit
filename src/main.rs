@@ -1,3 +1,5 @@
+mod prompts;
+
 use async_openai::{
     config::OpenAIConfig,
     types::{
@@ -155,6 +157,7 @@ async fn main() -> Result<(), ()> {
 
     let commit_schema = generator.subschema_for::<Commit>().into_object();
 
+    let system_role_contents = prompts::system_role_content().content;
     let completion = client
         .chat()
         .create(
@@ -162,10 +165,7 @@ async fn main() -> Result<(), ()> {
                 .messages(vec![
                     ChatCompletionRequestMessage {
                         role: Role::System,
-                        content: Some(
-                            "You are an experienced programmer who writes great commit messages."
-                                .to_string(),
-                        ),
+                        content: Some(system_role_contents),
                         ..Default::default()
                     },
                     ChatCompletionRequestMessage {
